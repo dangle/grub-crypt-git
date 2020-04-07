@@ -1,0 +1,27 @@
+From 75bd7917c3e8915669712b72f7aa32c791e491ec Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Melissa=20Nu=C3=B1o?= <dangle@users.noreply.github.com>
+Date: Tue, 7 Apr 2020 16:31:29 -0600
+Subject: [PATCH] Remove "Welcome to Grub!" message.
+
+---
+ grub-core/kern/main.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
+index 9cad0c448..58de4357d 100644
+--- a/grub-core/kern/main.c
++++ b/grub-core/kern/main.c
+@@ -270,8 +270,8 @@ grub_main (void)
+   grub_boot_time ("After machine init.");
+ 
+   /* Hello.  */
+-  grub_setcolorstate (GRUB_TERM_COLOR_HIGHLIGHT);
+-  grub_printf ("Welcome to GRUB!\n\n");
++  // grub_setcolorstate (GRUB_TERM_COLOR_HIGHLIGHT);
++  // grub_printf ("Welcome to GRUB!\n\n");
+   grub_setcolorstate (GRUB_TERM_COLOR_STANDARD);
+ 
+   grub_load_config ();
+-- 
+2.26.0
+

@@ -16,7 +16,7 @@ _build_platforms="i386-pc ${_target_arch}-efi"
 [[ "${CARCH}" == "x86_64" ]] && [[ "${_ia32_efi_in_arch_x64}" == "1" ]] && _build_platforms+=" i386-efi"
 [[ "${_grub_emu_build}" == "1" ]] && _build_platforms+=" ${_target_arch}-emu"
 
-pkgname="grub-git-crypt"
+pkgname="grub-crypt-git"
 pkgver=cryptopatch_v3.r727.g99862721a
 pkgrel=1
 pkgdesc="GNU GRand Unified Bootloader (2)"
@@ -39,19 +39,23 @@ if [[ "${_grub_emu_build}" == "1" ]]; then
 fi
 
 provides=("${pkgname%-*}")
-conflicts=("${pkgname%-*}" "grub-git")
+conflicts=("${pkgname%-*}"
+           "grub"
+           "grub-git")
 backup=('etc/default/grub'
         'etc/grub.d/40_custom')
 install="${pkgname}.install"
 source=("grub::git+https://github.com/dangle/grub.git"
         "grub-extras::git+https://git.savannah.gnu.org/git/grub-extras.git"
         "gnulib::git+https://git.savannah.gnu.org/git/gnulib.git"
+        '0001-Remove-Welcome-to-Grub-message.patch'
         '10_linux-detect-archlinux-initramfs.patch'
         'add-GRUB_COLOR_variables.patch'
         'grub.default')
 sha256sums=('SKIP'
             'SKIP'
             'SKIP'
+            '112e95b6f506aa71326dde96ed5cc92cdf66de03092fa68653d810316e275e68'
             '171415ab075d1ac806f36c454feeb060f870416f24279b70104bba94bd6076d4'
             'a5198267ceb04dceb6d2ea7800281a42b3f91fd02da55d2cc9ea20d47273ca29'
             '690adb7943ee9fedff578a9d482233925ca3ad3e5a50fffddd27cf33300a89e3')
@@ -65,6 +69,9 @@ prepare() {
     # Patch to enable GRUB_COLOR_* variables in grub-mkconfig.
     # Based on http://lists.gnu.org/archive/html/grub-devel/2012-02/msg00021.html
     patch -Np1 -i "$srcdir"/add-GRUB_COLOR_variables.patch
+
+    # Patch to remove the Welcome to Grub message.
+    patch -Np1 -i "$srcdir"/0001-Remove-Welcome-to-Grub-message.patch
 
     # Fix DejaVuSans.ttf location so that grub-mkfont can create *.pf2 files for starfield theme.
     sed 's|/usr/share/fonts/dejavu|/usr/share/fonts/dejavu /usr/share/fonts/TTF|g' -i "configure.ac"
