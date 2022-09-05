@@ -48,30 +48,29 @@ install="${pkgname}.install"
 source=("grub::git+https://github.com/dangle/grub.git"
         "grub-extras::git+https://git.savannah.gnu.org/git/grub-extras.git"
         "gnulib::git+https://git.savannah.gnu.org/git/gnulib.git"
-        '0001-Remove-Welcome-to-Grub-message.patch'
-        '10_linux-detect-archlinux-initramfs.patch'
+        '02-linux-detect-archlinux-initramfs.patch'
         'add-GRUB_COLOR_variables.patch'
+        '04-gettext_quiet.patch'
+        '06-maybe_quiet.patch'
         'grub.default')
 sha256sums=('SKIP'
             'SKIP'
             'SKIP'
-            '112e95b6f506aa71326dde96ed5cc92cdf66de03092fa68653d810316e275e68'
-            '171415ab075d1ac806f36c454feeb060f870416f24279b70104bba94bd6076d4'
-            'a5198267ceb04dceb6d2ea7800281a42b3f91fd02da55d2cc9ea20d47273ca29'
-            '690adb7943ee9fedff578a9d482233925ca3ad3e5a50fffddd27cf33300a89e3')
+            'SKIP'
+            'SKIP'
+            'SKIP'
+            'SKIP'
+            'SKIP')
  
 prepare() {
     cd grub
 
     # Patch grub-mkconfig to detect Arch Linux initramfs images.
-    patch -Np1 -i "$srcdir"/10_linux-detect-archlinux-initramfs.patch
+    patch -Np1 -i "$srcdir"/02-linux-detect-archlinux-initramfs.patch
 
     # Patch to enable GRUB_COLOR_* variables in grub-mkconfig.
     # Based on http://lists.gnu.org/archive/html/grub-devel/2012-02/msg00021.html
     patch -Np1 -i "$srcdir"/add-GRUB_COLOR_variables.patch
-
-    # Patch to remove the Welcome to Grub message.
-    patch -Np1 -i "$srcdir"/0001-Remove-Welcome-to-Grub-message.patch
 
     # Fix DejaVuSans.ttf location so that grub-mkfont can create *.pf2 files for starfield theme.
     sed 's|/usr/share/fonts/dejavu|/usr/share/fonts/dejavu /usr/share/fonts/TTF|g' -i "configure.ac"
@@ -81,6 +80,9 @@ prepare() {
 
     # Modify grub-mkconfig behaviour so automatically generated entries read 'Arch Linux' FS#33393
     sed 's|GNU/Linux|Linux|' -i "util/grub.d/10_linux.in"
+
+    patch -Np1 -i "${srcdir}/04-gettext_quiet.patch"
+ 	patch -Np1 -i "${srcdir}/06-maybe_quiet.patch"
 
     # Pull in latest language files
     ./linguas.sh
