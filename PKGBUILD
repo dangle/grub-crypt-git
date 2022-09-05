@@ -133,6 +133,7 @@ build() {
                 --enable-grub-mount \
                 --enable-mm-debug \
                 --enable-nls \
+                --enable-quiet-boot \
                 --disable-silent-rules \
                 --disable-werror \
                 CPPFLAGS="$CPPFLAGS -O2" \

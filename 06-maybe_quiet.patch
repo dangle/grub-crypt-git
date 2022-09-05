@@ -57,6 +57,7 @@ index 9e8f991..d2c4ce8 100644
  
  /* We don't need those.  */
  #define MINILZO_CFG_SKIP_LZO_PTR 1
+diff --git a/configure.ac b/configure.ac
 --- a/configure.ac
 +++ b/configure.ac
 @@ -1797,6 +1797,17 @@ else
@@ -88,6 +89,7 @@ index 9e8f991..d2c4ce8 100644
 +fi
  echo "*******************************************************"
  ]
+diff --git a/grub-core/boot/i386/pc/boot.S b/grub-core/boot/i386/pc/boot.S
 --- a/grub-core/boot/i386/pc/boot.S
 +++ b/grub-core/boot/i386/pc/boot.S
 @@ -19,6 +19,9 @@
@@ -118,6 +120,7 @@ index 9e8f991..d2c4ce8 100644
  	/* set %si to the disk address packet */
  	movw	$disk_address_packet, %si
  
+diff --git a/grub-core/boot/i386/pc/diskboot.S b/grub-core/boot/i386/pc/diskboot.S
 --- a/grub-core/boot/i386/pc/diskboot.S
 +++ b/grub-core/boot/i386/pc/diskboot.S
 @@ -18,6 +18,9 @@
@@ -196,6 +199,7 @@ index 9e8f991..d2c4ce8 100644
  notification_string:	.asciz "loading"
  
  notification_step:	.asciz "."
+diff --git a/grub-core/kern/main.c b/grub-core/kern/main.c
 --- a/grub-core/kern/main.c
 +++ b/grub-core/kern/main.c
 @@ -264,15 +264,25 @@ reclaim_module_space (void)
@@ -237,6 +241,7 @@ index 9e8f991..d2c4ce8 100644
 +
    grub_rescue_run ();
  }
+diff --git a/grub-core/kern/rescue_reader.c b/grub-core/kern/rescue_reader.c
 --- a/grub-core/kern/rescue_reader.c
 +++ b/grub-core/kern/rescue_reader.c
 @@ -78,7 +78,9 @@ grub_rescue_read_line (char **line, int cont,
@@ -249,6 +254,7 @@ index 9e8f991..d2c4ce8 100644
  
    while (1)
      {
+diff --git a/grub-core/normal/main.c b/grub-core/normal/main.c
 --- a/grub-core/normal/main.c
 +++ b/grub-core/normal/main.c
 @@ -389,6 +389,15 @@ static grub_err_t
@@ -277,6 +283,7 @@ index 9e8f991..d2c4ce8 100644
  
    while (1)
      {
+diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
 --- a/grub-core/normal/menu.c
 +++ b/grub-core/normal/menu.c
 @@ -826,12 +826,18 @@ run_menu (grub_menu_t menu, int nested, int *auto_boot)
@@ -322,6 +329,7 @@ index 9e8f991..d2c4ce8 100644
  
        if (auto_boot)
  	grub_menu_execute_with_fallback (menu, e, autobooted,
+diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
 --- a/util/grub.d/10_linux.in
 +++ b/util/grub.d/10_linux.in
 @@ -21,5 +21,6 @@ prefix="@prefix@"
@@ -347,3 +355,14 @@ index 9e8f991..d2c4ce8 100644
  	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} rw ${args}
  EOF
    if test -n "${initrd}" -o -n "${initrd_extra}" ; then
+@@ -153,7 +153,9 @@
+       initrd_path="${initrd_path} ${rel_dirname}/${i}"
+     done
+     sed "s/^/$submenu_indentation/" << EOF
+-	echo	'$(echo "$message" | grub_quote)'
++    if [ x"$quiet_boot" = x0 ] || [ x"$type" != xsimple ]; then
++	  echo	'$(echo "$message" | grub_quote)'
++    fi
+ 	initrd	$(echo $initrd_path)
+ EOF
+   fi
