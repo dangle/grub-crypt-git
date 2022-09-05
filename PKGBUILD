@@ -18,7 +18,7 @@ _build_platforms="i386-pc ${_target_arch}-efi"
 
 pkgname="grub-crypt-git"
 pkgver=cryptopatch_v3.r727.g99862721a
-pkgrel=1
+pkgrel=2
 pkgdesc="GNU GRand Unified Bootloader (2)"
 arch=('x86_64' 'i686')
 url="https://www.gnu.org/software/grub/"

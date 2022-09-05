@@ -332,14 +332,15 @@ diff --git a/grub-core/normal/menu.c b/grub-core/normal/menu.c
 diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
 --- a/util/grub.d/10_linux.in
 +++ b/util/grub.d/10_linux.in
-@@ -21,5 +21,6 @@ prefix="@prefix@"
+@@ -20,6 +20,7 @@
+ prefix="@prefix@"
  exec_prefix="@exec_prefix@"
  datarootdir="@datarootdir@"
 +quiet_boot="@QUIET_BOOT@"
  
  . "$pkgdatadir/grub-mkconfig_lib"
  
-@@ -148,9 +149,13 @@ linux_entry ()
+@@ -140,9 +141,13 @@
      fi
      printf '%s\n' "${prepare_boot_cache}" | sed "s/^/$submenu_indentation/"
    fi
@@ -354,15 +355,71 @@ diff --git a/util/grub.d/10_linux.in b/util/grub.d/10_linux.in
 +    sed "s/^/$submenu_indentation/" << EOF
  	linux	${rel_dirname}/${basename} root=${linux_root_device_thisversion} rw ${args}
  EOF
-   if test -n "${initrd}" -o -n "${initrd_extra}" ; then
-@@ -153,7 +153,9 @@
+   if test -n "${initrd}" ; then
+@@ -152,10 +157,16 @@
+     for i in ${initrd}; do
        initrd_path="${initrd_path} ${rel_dirname}/${i}"
      done
-     sed "s/^/$submenu_indentation/" << EOF
+-    sed "s/^/$submenu_indentation/" << EOF
 -	echo	'$(echo "$message" | grub_quote)'
+-	initrd	$(echo $initrd_path)
 +    if [ x"$quiet_boot" = x0 ] || [ x"$type" != xsimple ]; then
-+	  echo	'$(echo "$message" | grub_quote)'
-+    fi
- 	initrd	$(echo $initrd_path)
++      sed "s/^/$submenu_indentation/" << EOF
++	    echo	'$(echo "$message" | grub_quote)'
++	    initrd	$(echo $initrd_path)
  EOF
++    else
++      sed "s/^/$submenu_indentation/" << EOF
++	    initrd	$(echo $initrd_path)
++EOF
++    fi
    fi
+   sed "s/^/$submenu_indentation/" << EOF
+ }
+diff --git a/grub-core/disk/geli.c b/grub-core/disk/geli.c
+--- a/grub-core/disk/geli.c
+--- b/grub-core/disk/geli.c
+@@ -437,7 +437,9 @@
+   keysize = grub_le_to_cpu16 (header.keylen) / GRUB_CHAR_BIT;
+   grub_memset (zero, 0, sizeof (zero));
+ 
++#ifndef QUIET_BOOT
+   grub_puts_ (N_("Attempting to decrypt master key..."));
++#endif
+ 
+   /* Get the passphrase from the user.  */
+   tmp = NULL;
+@@ -532,7 +534,9 @@
+ 
+       if (grub_memcmp (candidate_key.hmac, key_hmac, dev->hash->mdlen) != 0)
+ 	continue;
++#ifndef QUIET_BOOT
+       grub_printf_ (N_("Slot %d opened\n"), i);
++#endif
+ 
+       if (grub_le_to_cpu32 (header.version) >= 7)
+         {
+--- a/grub-core/disk/luks.c
+--- b/grub-core/disk/luks.c
+@@ -161,8 +161,9 @@
+ 
+   if (err)
+     return err;
+-
+-  grub_puts_ (N_("Attempting to decrypt master key..."));
++#ifndef QUIET_BOOT
++    grub_puts_ (N_("Attempting to decrypt master key..."));
++#endif
+   keysize = grub_be_to_cpu32 (header.keyBytes);
+   if (keysize > GRUB_CRYPTODISK_MAX_KEYLEN)
+     return grub_error (GRUB_ERR_BAD_FS, "key is too long");
+@@ -304,7 +305,9 @@
+ 
+           /* TRANSLATORS: It's a cryptographic key slot: one element of an array
+              where each element is either empty or holds a key.  */
++#ifndef QUIET_BOOT
+           grub_printf_ (N_("Slot %d opened\n"), i);
++#endif
+ 
+           /* Set the master key.  */
+           gcry_err = grub_cryptodisk_setkey (dev, candidate_key, keysize);
